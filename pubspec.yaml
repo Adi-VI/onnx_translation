@@ -1,6 +1,6 @@
 name: onnx_translation
 description: A Flutter package for ONNX-based translation models with tokenizer support.
-version: 0.1.0
+version: 0.1.1
 homepage: https://github.com/Adi-VI/onnx_translation
 repository: https://github.com/Adi-VI/onnx_translation
 license: MIT
