@@ -23,14 +23,17 @@ A Flutter package to run ONNX-based translation models with tokenizer support, d
 
 Add the package locally or as a dependency in your `pubspec.yaml`:
 
+```yaml
 dependencies:
   onnx_translation:
     path: ../onnx_translation
   onnxruntime: ^1.4.1
   ffi: ^2.0.0
+```
 
 Declare your model assets in your app’s `pubspec.yaml`:
 
+```yaml
 flutter:
   assets:
     - assets/my_model/encoder_model.onnx
@@ -38,13 +41,16 @@ flutter:
     - assets/my_model/vocab.json
     - assets/my_model/tokenizer_config.json
     - assets/my_model/generation_config.json
+```
 
 Place the corresponding ONNX model and tokenizer files inside `assets/my_model/` (or your chosen folder).
+If you do not specify modelBasePath, the package will look for assets under the default folder assets/onnx_model/.
 
 ## Usage
 
 Import and initialize the model:
 
+```dart
 import 'package:onnx_translation/onnx_translation.dart';
 
 void main() async {
@@ -53,6 +59,7 @@ void main() async {
   final output = await model.runModel("Hello world", initialLangToken: '>>ara<<');
   print('Translated: $output');
 }
+```
 
 Use the optional `initialLangToken` to specify target language tokens if your model requires it.
 
@@ -108,4 +115,4 @@ Additional files like the following might also be present but are not currently 
 
 Contributions and issues are welcome via GitHub.
 Please file issues for bug reports or feature requests.
-This project is licensed under the MIT License. See the LICENSE file for details
+This project is licensed under the MIT License. See the LICENSE file for details.
