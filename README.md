@@ -1,6 +1,6 @@
 # onnx_translation
 
-A Flutter package to run ONNX-based translation models with tokenizer support, designed for seamless integration with MarianMT models exported from Hugging Face’s Helsinki-NLP collection. Enables efficient offline translation in Flutter apps.
+A Flutter package for offline LLM (large language model) inference, enabling ONNX-based translation models with tokenizer support. Designed for seamless integration with MarianMT models exported from Hugging Face’s Helsinki-NLP collection. Enables efficient offline translation in Flutter apps.
 
 ## Features
 

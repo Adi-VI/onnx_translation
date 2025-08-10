@@ -1,3 +1,10 @@
+/// onnx_translation
+///
+/// A Flutter package for running ONNX-based translation models with tokenizer support.
+/// Designed for efficient offline translation using MarianMT and similar models.
+///
+library onnx_translation;
+
 import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/services.dart';
@@ -29,15 +36,23 @@ import 'package:onnxruntime/onnxruntime.dart';
 class OnnxModel {
   late OrtSession _encoderSession;
   late OrtSession _decoderSession;
-  late Map<String, int> _vocab;        // token -> id
+  late Map<String, int> _vocab; // token -> id
   late Map<int, String> _reverseVocab; // id -> token
 
-  /// Token IDs loaded from tokenizer/generation configs if available.
+  /// Token ID representing the end-of-sequence token `</s>`.
+  /// Used to mark the end of input or generated sequences.
   late int eosTokenId;
+
+  /// Token ID representing the padding token `<pad>`.
+  /// Used to pad input sequences and initialize decoder input.
   late int padTokenId;
+
+  /// Token ID representing the unknown token `<unk>`.
+  /// Used to represent tokens not found in the vocabulary.
   late int unkTokenId;
 
-  /// Regex to detect special tokens like `<2hi>`, `<en>`, etc.
+  /// Regular expression to detect special tokens enclosed in angle brackets,
+  /// e.g., `<en>`, `<2hi>`, etc.
   final RegExp _specialTokenRegex = RegExp(r'<[^>]+>');
 
   /// Default constructor.
@@ -101,18 +116,25 @@ class OnnxModel {
         Map.fromEntries(_vocab.entries.map((e) => MapEntry(e.value, e.key)));
 
     // Initialize token IDs with sane defaults
-    eosTokenId = _reverseVocab.entries.firstWhere(
-      (e) => e.value == '</s>',
-      orElse: () => MapEntry(0, '</s>'),
-    ).key;
-    unkTokenId = _reverseVocab.entries.firstWhere(
-      (e) => e.value == '<unk>',
-      orElse: () => MapEntry(1, '<unk>'),
-    ).key;
-    padTokenId = _reverseVocab.entries.firstWhere(
-      (e) => e.value == '<pad>',
-      orElse: () => MapEntry((_vocab['<pad>'] ?? -1) >= 0 ? _vocab['<pad>']! : 0, '<pad>'),
-    ).key;
+    eosTokenId = _reverseVocab.entries
+        .firstWhere(
+          (e) => e.value == '</s>',
+          orElse: () => MapEntry(0, '</s>'),
+        )
+        .key;
+    unkTokenId = _reverseVocab.entries
+        .firstWhere(
+          (e) => e.value == '<unk>',
+          orElse: () => MapEntry(1, '<unk>'),
+        )
+        .key;
+    padTokenId = _reverseVocab.entries
+        .firstWhere(
+          (e) => e.value == '<pad>',
+          orElse: () => MapEntry(
+              (_vocab['<pad>'] ?? -1) >= 0 ? _vocab['<pad>']! : 0, '<pad>'),
+        )
+        .key;
 
     // Attempt to load tokenizer_config.json for pad/unk tokens
     try {
@@ -171,7 +193,8 @@ class OnnxModel {
     if (normalized.isEmpty) return [eosTokenId];
 
     final tokenIds = <int>[];
-    final tokens = _vocab.keys.toList()..sort((a, b) => b.length.compareTo(a.length));
+    final tokens = _vocab.keys.toList()
+      ..sort((a, b) => b.length.compareTo(a.length));
 
     int pos = 0;
     while (pos < normalized.length) {
@@ -236,7 +259,20 @@ class OnnxModel {
   /// Checks if a token string is punctuation.
   bool _isPunctuation(String token) {
     const punctuations = {
-      '.', ',', '!', '?', ':', ';', '-', '—', '(', ')', '[', ']', '"', '\''
+      '.',
+      ',',
+      '!',
+      '?',
+      ':',
+      ';',
+      '-',
+      '—',
+      '(',
+      ')',
+      '[',
+      ']',
+      '"',
+      '\''
     };
     return punctuations.contains(token);
   }
